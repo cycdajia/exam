@@ -3,182 +3,308 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>考試時程表</title>
+  <title>聖誕考試時程表</title>
   
-  <!-- 引入 Google Fonts: Klee One -->
+  <!-- 引入 Google Fonts: 選擇具手寫感或節慶氛圍的字體 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Delius&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- 引入 Tailwind CSS (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- 引入 Phosphor Icons (圖示庫) -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  
   <style>
     :root {
-      --chalk-white: #f8fafc;
-      --chalk-yellow: #fef08a;
-      --chalk-red: #fca5a5;
-      --chalk-blue: #93c5fd;
-      --chalk-green: #86efac;
-      --chalk-purple: #d8b4fe;
-      --board-bg: #2a3431; 
+      --xmas-green: #1b4b36;
+      --xmas-green-light: #2c6347;
+      --xmas-red: #d32f2f;
+      --xmas-gold: #fbc02d;
+      --xmas-gold-light: #ffeb3b;
+      --xmas-snow: #f8f9fa;
+      --xmas-text: #ffe082;
     }
     
     body { 
-      font-family: 'Klee One', cursive, sans-serif; 
-      background-color: var(--board-bg);
-      color: var(--chalk-white);
+      font-family: 'Noto Sans TC', 'Delius', sans-serif;
+      background-color: var(--xmas-green);
+      color: var(--xmas-snow);
+      /* Base background texture to mimic the canvas feel */
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+    }
+
+    h1, .festive-text {
+      font-family: 'Caveat Brush', cursive;
     }
     
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
-    
-    .chalkboard-bg {
-      background-color: #26302c;
-      background-image: 
-        radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px),
-        radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 32px 32px;
-      background-position: 0 0, 16px 16px;
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
+
+    /* Custom styles for schedule items */
+    .schedule-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      border: 2px solid rgba(255, 213, 79, 0.3);
+      border-radius: 1rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .schedule-card:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 213, 79, 0.6);
+      transform: translateY(-2px);
+    }
+    .schedule-card-active {
+      background: rgba(211, 47, 47, 0.8); /* Red background for active */
+      border: 2px solid var(--xmas-gold);
+      box-shadow: 0 0 20px rgba(251, 192, 45, 0.4);
     }
 
-    .chalk-text { text-shadow: 0px 0px 3px rgba(255, 255, 255, 0.4), 0px 0px 8px rgba(255, 255, 255, 0.1); }
-    .chalk-text-yellow { color: var(--chalk-yellow); text-shadow: 0px 0px 4px rgba(254, 240, 138, 0.5); }
-    .chalk-text-red { color: var(--chalk-red); text-shadow: 0px 0px 4px rgba(252, 165, 165, 0.5); }
-
-    .chalk-box {
-      border: 2px solid rgba(255,255,255,0.6);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      background: rgba(255,255,255,0.02);
+    /* Input styles for settings */
+    .festive-input {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      border-radius: 0.5rem;
     }
-    .chalk-box:hover {
-      background: rgba(255,255,255,0.05);
-      border-color: rgba(255,255,255,0.9);
-    }
-    .chalk-box-active {
-      border: 3px solid var(--chalk-yellow);
-      border-radius: 15px 255px 15px 225px / 225px 15px 255px 15px;
-      background: rgba(254, 240, 138, 0.05);
-    }
-
-    .wooden-ledge {
-      background: linear-gradient(to bottom, #bd8349, #7a4f27);
-      border-top: 2px solid #e1b483;
-      box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
-      position: relative;
-    }
-    .chalk-piece {
-      position: absolute;
-      bottom: 6px;
-      width: 45px;
-      height: 12px;
-      border-radius: 3px;
-      box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2), 2px 2px 4px rgba(0,0,0,0.3);
-    }
-    
-    .chalk-input {
-      background: rgba(0,0,0,0.2);
-      border: none;
-      border-bottom: 2px dashed rgba(255,255,255,0.5);
-      color: var(--chalk-white);
-      font-family: 'Klee One', cursive;
-    }
-    .chalk-input:focus {
+    .festive-input:focus {
       outline: none;
-      border-bottom-color: var(--chalk-yellow);
-      background: rgba(0,0,0,0.4);
+      border-color: var(--xmas-gold);
+      background: rgba(255,255,255,0.2);
     }
     ::-webkit-calendar-picker-indicator {
       filter: invert(1);
-      opacity: 0.7;
       cursor: pointer;
+    }
+
+    /* Decorative elements specific to the image style */
+    .border-stripes {
+      border: 8px solid transparent;
+      border-image: repeating-linear-gradient(
+        45deg,
+        var(--xmas-green) 0,
+        var(--xmas-green) 10px,
+        rgba(0,0,0,0.2) 10px,
+        rgba(0,0,0,0.2) 20px
+      ) 8;
+    }
+
+    /* Glow effect for text */
+    .text-glow {
+      text-shadow: 0 0 10px rgba(255, 235, 59, 0.6);
     }
   </style>
 </head>
-<body class="antialiased overflow-hidden selection:bg-[#fef08a] selection:text-black chalkboard-bg h-screen flex flex-col relative">
+<body class="antialiased overflow-hidden selection:bg-[var(--xmas-gold)] selection:text-[var(--xmas-green)] h-screen flex flex-col relative border-stripes">
+
+  <!-- Top string lights decoration -->
+  <div class="absolute top-0 left-0 w-full h-32 pointer-events-none z-0 overflow-hidden">
+    <!-- SVG representation of string lights -->
+    <svg width="100%" height="100%" viewBox="0 0 1200 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,20 Q150,60 300,20 T600,20 T900,20 T1200,20" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+      <path d="M0,10 Q200,80 400,10 T800,10 T1200,10" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+      
+      <!-- Lights (Circles) -->
+      <g fill="#ffeb3b">
+        <circle cx="50" cy="25" r="4" filter="blur(2px)"/>
+        <circle cx="50" cy="25" r="2" fill="#fff"/>
+        
+        <circle cx="150" cy="40" r="5" filter="blur(2px)"/>
+        <circle cx="150" cy="40" r="2.5" fill="#fff"/>
+        
+        <circle cx="250" cy="28" r="4" filter="blur(2px)"/>
+        <circle cx="250" cy="28" r="2" fill="#fff"/>
+        
+        <circle cx="350" cy="22" r="3" filter="blur(1px)"/>
+        <circle cx="350" cy="22" r="1.5" fill="#fff"/>
+
+        <circle cx="450" cy="35" r="5" filter="blur(3px)"/>
+        <circle cx="450" cy="35" r="2.5" fill="#fff"/>
+
+        <circle cx="550" cy="20" r="4" filter="blur(2px)"/>
+        <circle cx="550" cy="20" r="2" fill="#fff"/>
+
+        <!-- Hanging warm glowing orb -->
+        <circle cx="320" cy="65" r="12" fill="url(#warm-glow)" opacity="0.8"/>
+        <line x1="320" y1="20" x2="320" y2="53" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+        
+        <circle cx="700" cy="45" r="10" fill="url(#warm-glow)" opacity="0.7"/>
+        <line x1="700" y1="12" x2="700" y2="35" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+      </g>
+      <defs>
+        <radialGradient id="warm-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#fff9c4"/>
+          <stop offset="30%" stop-color="#ffb300"/>
+          <stop offset="100%" stop-color="rgba(255, 179, 0, 0)"/>
+        </radialGradient>
+      </defs>
+    </svg>
+  </div>
+
+  <!-- Background Town Silhouette -->
+  <div class="absolute bottom-0 left-0 w-full h-1/3 pointer-events-none z-0 opacity-40">
+    <svg width="100%" height="100%" viewBox="0 0 1000 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,200 L0,150 L50,150 L50,130 L90,130 L90,150 L150,150 L150,110 L220,70 L290,110 L290,150 L350,150 L350,120 L400,120 L400,150 L500,150 L500,100 L560,60 L620,100 L620,150 L700,150 L700,110 L750,110 L750,150 L850,150 L850,90 L920,50 L990,90 L990,150 L1000,150 L1000,200 Z" fill="#123524"/>
+      <!-- Windows -->
+      <rect x="60" y="160" width="10" height="15" fill="#2c6347"/>
+      <rect x="110" y="160" width="10" height="15" fill="#2c6347"/>
+      <rect x="200" y="120" width="15" height="20" fill="#2c6347"/>
+      <rect x="240" y="120" width="15" height="20" fill="#2c6347"/>
+      <rect x="310" y="160" width="12" height="15" fill="#2c6347"/>
+      <rect x="520" y="110" width="15" height="25" fill="#2c6347"/>
+      <rect x="580" y="110" width="15" height="25" fill="#2c6347"/>
+    </svg>
+  </div>
+
+  <!-- Left Decorative Elements (Tree & Santa) -->
+  <div class="absolute bottom-0 left-0 w-[40%] max-w-[400px] h-[60%] pointer-events-none z-20 flex flex-col justify-end">
+    <!-- Simplified SVG representation of Tree and Santa -->
+    <svg viewBox="0 0 400 500" class="w-full h-auto drop-shadow-2xl">
+      <!-- Tree -->
+      <path d="M200,50 L120,200 L160,200 L90,350 L140,350 L50,500 L350,500 L260,350 L310,350 L240,200 L280,200 Z" fill="#2c7a51"/>
+      <path d="M200,50 L120,200 L160,200 L90,350 L140,350 L50,500 L200,500 Z" fill="#1f5a3b"/> <!-- Shadow side -->
+      <!-- Star -->
+      <polygon points="200,20 210,40 230,45 215,60 220,80 200,70 180,80 185,60 170,45 190,40" fill="#ffeb3b"/>
+      
+      <!-- Snow on tree -->
+      <path d="M200,50 Q180,90 140,110 Q160,115 150,140" fill="#fff" opacity="0.8"/>
+      <path d="M130,200 Q140,220 170,230 Q160,240 165,260" fill="#fff" opacity="0.8"/>
+      <path d="M240,200 Q230,220 210,210 Q215,225 200,240" fill="#fff" opacity="0.8"/>
+
+      <!-- Santa Sleigh Base -->
+      <path d="M30,420 Q100,420 200,450 L180,500 L20,500 Q10,450 30,420 Z" fill="#5d4037"/>
+      <!-- Santa (Very Simplified) -->
+      <circle cx="120" cy="360" r="30" fill="#d32f2f"/> <!-- Body -->
+      <circle cx="120" cy="300" r="25" fill="#ffccbc"/> <!-- Face -->
+      <path d="M90,300 Q120,350 150,300 Z" fill="#fff"/> <!-- Beard -->
+      <path d="M95,280 L145,280 L120,240 Z" fill="#d32f2f"/> <!-- Hat -->
+      <circle cx="120" cy="240" r="8" fill="#fff"/> <!-- Hat pompom -->
+    </svg>
+  </div>
+
+  <!-- Right Decorative Elements (Snowman, Reindeer, Presents) -->
+  <div class="absolute bottom-0 right-0 w-[45%] max-w-[450px] h-[65%] pointer-events-none z-20 flex flex-col justify-end">
+    <svg viewBox="0 0 450 500" class="w-full h-auto drop-shadow-2xl">
+       <!-- Falling Present -->
+       <g transform="translate(150, 100) rotate(15)">
+         <rect x="0" y="0" width="50" height="50" fill="#4caf50"/>
+         <rect x="20" y="0" width="10" height="50" fill="#f44336"/>
+         <rect x="0" y="20" width="50" height="10" fill="#f44336"/>
+         <path d="M25,0 Q10,-15 25,-20 Q40,-15 25,0 Z" fill="#ffeb3b"/>
+       </g>
+
+      <!-- Smaller background tree -->
+      <path d="M350,150 L280,280 L320,280 L250,420 L450,420 L380,280 L420,280 Z" fill="#2c7a51" opacity="0.8"/>
+
+      <!-- Snowman -->
+      <circle cx="200" cy="400" r="80" fill="#fff"/> <!-- Base -->
+      <circle cx="200" cy="280" r="60" fill="#fff"/> <!-- Head -->
+      <!-- Snowman features -->
+      <circle cx="180" cy="270" r="5" fill="#3e2723"/> <!-- Eye L -->
+      <circle cx="220" cy="270" r="5" fill="#3e2723"/> <!-- Eye R -->
+      <path d="M200,285 L160,300 L200,295 Z" fill="#e64a19"/> <!-- Carrot nose -->
+      <!-- Scarf -->
+      <path d="M150,330 Q200,350 250,330 L260,360 Q200,380 140,360 Z" fill="#ff9800"/>
+      <rect x="220" y="340" width="30" height="70" fill="#ff9800" rx="5"/>
+      <!-- Hands -->
+      <path d="M140,300 L80,240" stroke="#5d4037" stroke-width="8" stroke-linecap="round"/>
+      <path d="M260,300 L320,240" stroke="#5d4037" stroke-width="8" stroke-linecap="round"/>
+      <!-- Mittens -->
+      <circle cx="80" cy="240" r="20" fill="#f44336"/>
+      <path d="M60,240 Q80,220 100,240" fill="#fff"/>
+      <circle cx="320" cy="240" r="20" fill="#f44336"/>
+      <path d="M300,240 Q320,220 340,240" fill="#fff"/>
+
+      <!-- Reindeer (Foreground) -->
+      <g transform="translate(250, 320)">
+        <path d="M20,100 Q40,40 100,40 Q130,50 140,90 Q150,150 80,180 Z" fill="#8d6e63"/> <!-- Body -->
+        <circle cx="50" cy="50" r="30" fill="#8d6e63"/> <!-- Head -->
+        <circle cx="20" cy="50" r="10" fill="#f44336"/> <!-- Red Nose -->
+        <circle cx="45" cy="40" r="4" fill="#fff"/> <circle cx="45" cy="40" r="2" fill="#000"/> <!-- Eye -->
+        <!-- Antlers -->
+        <path d="M60,30 Q80,0 100,10" stroke="#4e342e" stroke-width="6" stroke-linecap="round" fill="none"/>
+        <path d="M80,15 L90,0" stroke="#4e342e" stroke-width="5" stroke-linecap="round"/>
+        <!-- Collar -->
+        <path d="M40,75 Q60,85 80,75" stroke="#f44336" stroke-width="8" fill="none"/>
+        <circle cx="60" cy="82" r="8" fill="#ffeb3b"/>
+      </g>
+    </svg>
+  </div>
 
   <!-- 頂部設定按鈕 -->
-  <button onclick="openSettings()" class="absolute top-4 right-4 md:top-6 md:right-6 p-2 md:p-3 text-white/60 hover:text-white transition-colors duration-300 z-20 flex items-center justify-center rounded-full hover:bg-white/10" title="系統管理">
-    <i class="ph ph-gear-six text-3xl md:text-4xl chalk-text"></i>
+  <button onclick="openSettings()" class="absolute top-4 right-4 md:top-6 md:right-6 p-2 md:p-3 text-[var(--xmas-gold)] hover:text-white transition-colors duration-300 z-50 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-sm" title="系統管理">
+    <i class="ph ph-gear-six text-3xl md:text-4xl"></i>
   </button>
 
-  <!-- 主容器 (移除滾動，改為高度滿版且內容置中) -->
-  <div class="flex-1 w-full flex flex-col min-h-0 overflow-hidden">
+  <!-- 主容器 -->
+  <div class="flex-1 w-full flex flex-col min-h-0 overflow-hidden relative z-30">
     
-    <!-- 上方：巨大時鐘與叮嚀區塊 (高度自適應，字體放大) -->
-    <div class="w-full flex flex-col justify-center items-center pt-6 md:pt-10 pb-2 shrink-0 z-10">
-      <div id="clock-display" class="font-bold tracking-[0.1em] tabular-nums text-center chalk-text" style="font-size: clamp(6rem, 22vh, 25rem); line-height: 1;">
+    <!-- 上方：標題與時鐘 (Merry Christmas 風格) -->
+    <div class="w-full flex flex-col justify-center items-center pt-12 md:pt-16 pb-4 shrink-0 z-10">
+      <h1 class="festive-text text-5xl md:text-7xl lg:text-8xl text-[var(--xmas-gold)] text-glow mb-2 tracking-wide leading-none text-center">
+        EXAM SCHEDULE
+      </h1>
+      <div id="clock-display" class="font-bold tabular-nums text-center text-white/90 drop-shadow-md" style="font-size: clamp(3rem, 10vh, 8rem); line-height: 1; font-family: 'Delius', cursive;">
         --:--:--
       </div>
-      <div id="notes-display" class="text-2xl md:text-4xl mt-4 md:mt-6 tracking-widest chalk-text-yellow px-6 text-center max-w-5xl leading-relaxed">
+      <div id="notes-display" class="text-xl md:text-3xl mt-4 md:mt-6 text-[var(--xmas-snow)] px-6 text-center max-w-4xl leading-relaxed bg-black/20 backdrop-blur-sm py-2 px-6 rounded-full border border-white/20">
       </div>
     </div>
 
-    <!-- 下方/中央：考試科目清單區塊 (動態填滿剩餘高度並置中卡片) -->
-    <div class="w-full max-w-[1600px] mx-auto px-4 md:px-8 pb-12 md:pb-16 pt-2 flex-1 flex flex-col justify-center items-center min-h-0">
-      <div id="schedule-container" class="flex flex-row flex-wrap justify-center items-center content-center gap-3 md:gap-5 w-full h-full overflow-hidden">
+    <!-- 下方/中央：考試科目清單區塊 -->
+    <div class="w-full max-w-[1200px] mx-auto px-4 md:px-8 pb-32 pt-4 flex-1 flex flex-col justify-center items-center min-h-0">
+      <div id="schedule-container" class="flex flex-row flex-wrap justify-center items-center content-center gap-4 md:gap-6 w-full h-full overflow-hidden">
         <!-- 內容由 JavaScript 動態生成 -->
       </div>
     </div>
   </div>
 
   <!-- 右下方：倒數計時器 (浮動) -->
-  <div id="countdown-container" class="fixed bottom-10 md:bottom-12 right-4 md:right-8 z-30 hidden transition-all duration-500 chalk-box p-4 md:p-5 bg-[#26302c]/95 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.6)] transform translate-y-0">
-    <div class="text-[var(--chalk-red)] text-xs md:text-sm font-bold tracking-[0.2em] mb-1 md:mb-2 flex items-center gap-2">
-      <i class="ph-fill ph-timer animate-pulse"></i> 本節剩餘時間
+  <div id="countdown-container" class="fixed bottom-10 md:bottom-12 right-4 md:right-8 z-50 hidden transition-all duration-500 bg-[var(--xmas-red)] p-4 md:p-6 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-4 border-[var(--xmas-gold)] transform translate-y-0">
+    <div class="text-[var(--xmas-gold)] text-sm md:text-base font-bold tracking-[0.1em] mb-1 md:mb-2 flex items-center gap-2 uppercase">
+      <i class="ph-fill ph-bell-ringing animate-bounce"></i> Time Remaining
     </div>
-    <div id="countdown-display" class="text-5xl md:text-7xl font-mono chalk-text-red tabular-nums text-center font-bold tracking-widest leading-none">
+    <div id="countdown-display" class="text-5xl md:text-7xl font-mono text-white tabular-nums text-center font-bold tracking-widest leading-none drop-shadow-lg">
       --:--
     </div>
   </div>
-  
-  <!-- 底部木頭粉筆槽裝飾 (固定於底部) -->
-  <div class="wooden-ledge fixed bottom-0 left-0 w-full h-4 md:h-6 z-40">
-    <div class="chalk-piece bg-[#fca5a5] left-[10%] rotate-[-15deg]"></div>
-    <div class="chalk-piece bg-[#f8fafc] left-[15%] rotate-[5deg]"></div>
-    <div class="chalk-piece bg-[#86efac] left-[45%] md:left-[50%] rotate-[20deg]"></div>
-    <div class="chalk-piece bg-[#93c5fd] right-[30%] rotate-[-10deg]"></div>
-    <div class="chalk-piece bg-[#fef08a] right-[25%] rotate-[12deg]"></div>
-    <div class="chalk-piece bg-[#d8b4fe] right-[5%] rotate-[-5deg]"></div>
-  </div>
 
   <!-- 設定對話視窗 (Modal) -->
-  <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm justify-center items-center z-50 p-4 hidden transition-opacity duration-300">
-    <div class="w-full max-w-4xl flex flex-col overflow-hidden max-h-[90vh] shadow-2xl animate-[fadeIn_0.2s_ease-out] rounded-xl border-[12px] border-[#8b5a2b] relative chalkboard-bg">
+  <div id="settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md justify-center items-center z-[100] p-4 hidden transition-opacity duration-300">
+    <div class="w-full max-w-4xl flex flex-col overflow-hidden max-h-[90vh] shadow-2xl animate-[fadeIn_0.2s_ease-out] rounded-2xl border-4 border-[var(--xmas-gold)] relative bg-[var(--xmas-green)]">
         
-        <div class="p-4 md:p-6 flex justify-between items-center shrink-0 border-b-2 border-white/20 bg-black/20">
-          <h3 class="text-xl md:text-2xl font-bold flex items-center gap-3 tracking-widest chalk-text">
-            <i class="ph ph-chalkboard-teacher text-3xl"></i> 系統管理與考程設定
+        <div class="p-4 md:p-6 flex justify-between items-center shrink-0 border-b border-white/20 bg-black/30">
+          <h3 class="text-xl md:text-2xl font-bold flex items-center gap-3 text-[var(--xmas-gold)] festive-text text-3xl">
+            <i class="ph-fill ph-gift text-3xl"></i> 考程設定與願望清單
           </h3>
-          <button onclick="closeSettings()" class="p-2 text-white/60 hover:text-white transition-colors">
+          <button onclick="closeSettings()" class="p-2 text-white/60 hover:text-white transition-colors bg-white/10 rounded-full">
             <i class="ph ph-x text-2xl"></i>
           </button>
         </div>
 
-        <div class="p-4 md:p-8 overflow-y-auto flex-1 flex flex-col md:flex-row gap-6 md:gap-8 min-h-0">
+        <div class="p-4 md:p-8 overflow-y-auto flex-1 flex flex-col md:flex-row gap-6 md:gap-8 min-h-0 relative">
           
           <!-- 左欄：全局設定 -->
           <div class="w-full md:w-5/12 flex flex-col gap-6">
-            <div class="chalk-box p-5 md:p-6 flex-1">
-              <h4 class="text-base md:text-lg font-bold text-[var(--chalk-yellow)] tracking-[0.2em] mb-4 md:mb-6 flex items-center gap-2 border-b-2 border-white/20 pb-3">
-                <i class="ph ph-sliders-horizontal"></i> 畫面顯示設定
+            <div class="bg-black/20 rounded-xl p-5 md:p-6 flex-1 border border-white/10">
+              <h4 class="text-base md:text-lg font-bold text-white tracking-[0.1em] mb-4 md:mb-6 flex items-center gap-2 border-b border-white/20 pb-3">
+                <i class="ph ph-magic-wand text-[var(--xmas-gold)]"></i> 畫面顯示設定
               </h4>
               
               <div class="space-y-4 md:space-y-6">
                 <label class="flex items-center gap-3 cursor-pointer group">
-                  <input type="checkbox" id="setting-countdown" onchange="autoSaveGlobalSettings()" class="w-5 h-5 rounded bg-black/20 border-white/50 text-[var(--chalk-yellow)] focus:ring-[var(--chalk-yellow)] cursor-pointer">
-                  <span class="text-lg md:text-xl chalk-text tracking-widest group-hover:text-[var(--chalk-yellow)] transition-colors">啟用右下方倒數計時</span>
+                  <input type="checkbox" id="setting-countdown" onchange="autoSaveGlobalSettings()" class="w-5 h-5 rounded bg-black/30 border-white/50 text-[var(--xmas-red)] focus:ring-[var(--xmas-red)] cursor-pointer">
+                  <span class="text-lg md:text-xl text-white/90 group-hover:text-[var(--xmas-gold)] transition-colors">啟用右下方倒數計時</span>
                 </label>
 
                 <div class="pt-2">
-                  <label class="block text-lg md:text-xl font-bold text-white/90 mb-2 md:mb-3 tracking-widest chalk-text flex items-center gap-2">
-                    <i class="ph ph-chat-text"></i> 老師的小叮嚀
+                  <label class="block text-lg md:text-xl font-bold text-white/90 mb-2 md:mb-3 flex items-center gap-2">
+                    <i class="ph ph-envelope-simple text-[var(--xmas-red)]"></i> 聖誕老人的叮嚀
                   </label>
-                  <textarea id="setting-notes" rows="3" onchange="autoSaveGlobalSettings()" placeholder="例如：請保持安靜，仔細檢查試卷！" class="w-full p-3 md:p-4 chalk-input text-lg md:text-xl resize-none rounded bg-black/20"></textarea>
+                  <textarea id="setting-notes" rows="3" onchange="autoSaveGlobalSettings()" placeholder="例如：祝大家考試順利，聖誕快樂！" class="w-full p-3 md:p-4 festive-input text-lg md:text-xl resize-none"></textarea>
                 </div>
               </div>
             </div>
@@ -186,37 +312,37 @@
 
           <!-- 右欄：考程編輯 -->
           <div class="w-full md:w-7/12 flex flex-col">
-            <h4 class="text-base md:text-lg font-bold text-white/80 tracking-[0.2em] mb-3 md:mb-4 flex items-center gap-2 border-l-4 border-white/60 pl-3">
-              黑板上的考程
+            <h4 class="text-base md:text-lg font-bold text-white tracking-[0.1em] mb-3 md:mb-4 flex items-center gap-2 border-l-4 border-[var(--xmas-gold)] pl-3">
+              考試行程表
             </h4>
             
-            <div class="p-4 md:p-5 chalk-box mb-4 md:mb-6 grid grid-cols-2 md:flex md:flex-wrap gap-3 items-end bg-white/5">
+            <div class="p-4 md:p-5 rounded-xl mb-4 md:mb-6 grid grid-cols-2 md:flex md:flex-wrap gap-3 items-end bg-black/20 border border-white/10">
               <div class="col-span-2 md:flex-1 md:min-w-[100px]">
-                <label class="block text-sm font-bold text-white/70 mb-1 md:mb-2 tracking-widest">科目名稱</label>
-                <input type="text" id="new-subject" placeholder="例：國文" class="w-full p-2 chalk-input text-base md:text-lg" />
+                <label class="block text-sm font-bold text-white/70 mb-1">科目名稱</label>
+                <input type="text" id="new-subject" placeholder="例：國文" class="w-full p-2.5 festive-input text-base md:text-lg" />
               </div>
-              <!-- 將寬度從原本的 w-20 加寬為 w-32 / w-40 -->
-              <div class="col-span-1 md:w-32 lg:w-40">
-                <label class="block text-sm font-bold text-white/70 mb-1 md:mb-2 tracking-widest">開始</label>
-                <input type="time" id="new-start" class="w-full p-2 chalk-input text-base md:text-lg" />
+              <div class="col-span-1 md:w-32">
+                <label class="block text-sm font-bold text-white/70 mb-1">開始</label>
+                <input type="time" id="new-start" class="w-full p-2.5 festive-input text-base md:text-lg" />
               </div>
-              <div class="col-span-1 md:w-32 lg:w-40">
-                <label class="block text-sm font-bold text-white/70 mb-1 md:mb-2 tracking-widest">結束</label>
-                <input type="time" id="new-end" class="w-full p-2 chalk-input text-base md:text-lg" />
+              <div class="col-span-1 md:w-32">
+                <label class="block text-sm font-bold text-white/70 mb-1">結束</label>
+                <input type="time" id="new-end" class="w-full p-2.5 festive-input text-base md:text-lg" />
               </div>
-              <button id="btn-submit-item" type="button" onclick="addEditingItem()" class="col-span-2 border-2 border-[var(--chalk-green)] text-[var(--chalk-green)] hover:bg-[var(--chalk-green)] hover:text-black p-2 flex items-center gap-1 font-bold transition-all w-full md:w-auto justify-center tracking-widest rounded shadow-sm text-sm md:text-base">
-                <i id="submit-icon" class="ph ph-plus text-lg"></i> <span id="submit-text">新增</span>
+              <button id="btn-submit-item" type="button" onclick="addEditingItem()" class="col-span-2 bg-[var(--xmas-red)] text-white hover:bg-red-700 p-2.5 flex items-center gap-1 font-bold transition-all w-full md:w-auto justify-center rounded-lg shadow-md text-sm md:text-base border border-red-900">
+                <i id="submit-icon" class="ph ph-plus-circle text-xl"></i> <span id="submit-text">新增</span>
               </button>
             </div>
 
-            <div id="editing-list" class="space-y-2 md:space-y-3 overflow-y-auto max-h-[30vh] pr-2">
+            <div id="editing-list" class="space-y-2 md:space-y-3 overflow-y-auto max-h-[30vh] pr-2 custom-scrollbar">
+              <!-- JS rendered list -->
             </div>
           </div>
         </div>
 
-        <div class="p-4 md:p-5 flex justify-end gap-4 shrink-0 border-t-2 border-white/20 bg-black/30">
-          <button onclick="closeSettings()" class="px-6 py-2 md:py-3 font-bold bg-white/10 text-white/90 hover:text-white border-2 border-white hover:bg-white hover:text-black rounded-lg transition-all tracking-widest text-base md:text-lg">
-            關閉視窗 (自動儲存)
+        <div class="p-4 md:p-5 flex justify-end gap-4 shrink-0 border-t border-white/20 bg-black/30">
+          <button onclick="closeSettings()" class="px-6 py-2 md:py-3 font-bold bg-[var(--xmas-gold)] text-black hover:bg-yellow-400 rounded-lg transition-all text-base md:text-lg shadow-lg">
+            完成設定 (自動儲存)
           </button>
         </div>
 
@@ -230,13 +356,13 @@
         { id: '2', subject: '英文', startTime: '09:50', endTime: '11:10' },
         { id: '3', subject: '數學', startTime: '11:30', endTime: '12:50' },
       ],
-      settings: { showCountdown: true, teacherNotes: '各位同學，考試加油！細心作答喔！' }
+      settings: { showCountdown: true, teacherNotes: '祝大家考試順利，提早預祝聖誕快樂！' }
     };
     
     let appData = JSON.parse(JSON.stringify(defaultData));
     
     try {
-      const savedData = localStorage.getItem('boardAppData');
+      const savedData = localStorage.getItem('xmasBoardAppData');
       if (savedData) appData = JSON.parse(savedData);
     } catch (e) {
       console.error('無法讀取本地儲存資料', e);
@@ -267,9 +393,9 @@
       
       if (appData.schedule.length === 0) {
         container.innerHTML = `
-          <div class="text-center text-white/50 mt-10 flex flex-col items-center w-full">
-            <i class="ph ph-wind text-5xl md:text-6xl mb-4 opacity-50"></i>
-            <p class="tracking-widest chalk-text text-lg md:text-xl">黑板上空空如也，請點擊右上角新增考程</p>
+          <div class="text-center text-white/60 mt-10 flex flex-col items-center w-full bg-black/20 p-8 rounded-2xl backdrop-blur-sm">
+            <i class="ph-fill ph-gift text-6xl mb-4 text-[var(--xmas-gold)] opacity-70"></i>
+            <p class="text-xl md:text-2xl festive-text">目前沒有安排考試，盡情享受節日吧！</p>
           </div>
         `;
         return;
@@ -277,35 +403,43 @@
 
       container.innerHTML = appData.schedule.map(exam => {
         const isActive = exam.id === activeExamId;
-        return `
-          <div class="p-3 md:p-4 transition-all duration-500 relative ${isActive ? 'chalk-box-active scale-105 shadow-[0_0_20px_rgba(254,240,138,0.15)] z-10' : 'chalk-box opacity-80 hover:opacity-100'} w-fit min-w-0 flex-shrink-0 group">
-            
-            ${isActive ? `<span class="absolute -top-3 -left-3 text-[var(--chalk-yellow)] border border-[var(--chalk-yellow)] bg-[#26302c] text-xs font-bold px-2 py-1 md:px-3 md:py-1.5 tracking-[0.2em] rounded-full animate-pulse whitespace-nowrap shadow-lg z-30">進行中</span>` : ''}
+        const cardClass = isActive ? 'schedule-card-active scale-110 z-10' : 'schedule-card opacity-90 hover:opacity-100';
+        const titleColor = isActive ? 'text-white' : 'text-[var(--xmas-gold)]';
+        const iconColor = isActive ? 'text-[var(--xmas-gold)]' : 'text-white/60';
+        const timeColor = isActive ? 'text-white' : 'text-white/90';
 
-            <div class="flex flex-col gap-1 md:gap-2 h-full justify-center pt-1">
+        return `
+          <div class="p-4 md:p-6 transition-all duration-500 relative ${cardClass} w-64 md:w-72 flex-shrink-0 group">
+            
+            ${isActive ? `
+              <div class="absolute -top-4 -right-4 bg-[var(--xmas-gold)] text-black text-xs font-bold px-3 py-1.5 rounded-full animate-bounce shadow-lg z-30 flex items-center gap-1">
+                <i class="ph-fill ph-star"></i> 進行中
+              </div>
+            ` : ''}
+
+            <div class="flex flex-col gap-3 h-full justify-center">
               
-              <!-- 科目名稱與圖示緊貼，移除所有不必要的空白 -->
-              <div class="flex items-center gap-2 mb-1">
-                <span class="text-2xl md:text-4xl font-bold tracking-widest leading-none ${isActive ? 'chalk-text-yellow' : 'chalk-text'}">
+              <div class="flex justify-between items-start border-b ${isActive ? 'border-[var(--xmas-gold)]' : 'border-white/20'} pb-2">
+                <span class="text-3xl md:text-4xl font-bold ${titleColor} font-['Noto_Sans_TC']">
                   ${exam.subject}
                 </span>
                 
-                <div class="flex gap-1 z-20 opacity-70 hover:opacity-100 transition-opacity">
-                  <button onclick="editFromMain('${exam.id}')" class="text-white/70 hover:text-[var(--chalk-yellow)] transition-colors bg-[#26302c]/50 rounded-full p-1.5" title="修改">
-                    <i class="ph ph-pencil-simple text-xl md:text-2xl"></i>
+                <div class="flex gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onclick="editFromMain('${exam.id}')" class="text-white hover:text-[var(--xmas-gold)] transition-colors bg-black/40 rounded-full p-1.5" title="修改">
+                    <i class="ph ph-pencil-simple text-lg"></i>
                   </button>
-                  <button onclick="deleteFromMain('${exam.id}')" class="text-white/70 hover:text-[var(--chalk-red)] transition-colors bg-[#26302c]/50 rounded-full p-1.5" title="擦除">
-                    <i class="ph ph-eraser text-xl md:text-2xl"></i>
+                  <button onclick="deleteFromMain('${exam.id}')" class="text-white hover:text-red-400 transition-colors bg-black/40 rounded-full p-1.5" title="刪除">
+                    <i class="ph ph-trash text-lg"></i>
                   </button>
                 </div>
               </div>
               
-              <!-- 下方時間區塊 -->
-              <div class="flex items-center gap-3 mt-1">
-                <i class="ph ${isActive ? 'ph-hourglass-high text-[var(--chalk-yellow)] animate-pulse' : 'ph-clock text-white/50'} text-3xl md:text-4xl"></i>
-                <div class="flex flex-col border-l-2 ${isActive ? 'border-[var(--chalk-yellow)]' : 'border-white/30'} pl-3 py-1 gap-1">
-                  <span class="tracking-[0.1em] font-mono text-xl md:text-3xl leading-none ${isActive ? 'chalk-text-yellow' : 'chalk-text'}">${exam.startTime}</span>
-                  <span class="tracking-[0.1em] font-mono text-xl md:text-3xl leading-none ${isActive ? 'chalk-text-yellow' : 'chalk-text'}">${exam.endTime}</span>
+              <div class="flex items-center gap-3">
+                <i class="ph-fill ${isActive ? 'ph-hourglass-high animate-spin-slow' : 'ph-clock'} text-3xl md:text-4xl ${iconColor}"></i>
+                <div class="flex flex-col gap-0.5">
+                  <span class="font-mono text-xl md:text-2xl font-bold ${timeColor}">${exam.startTime}</span>
+                  <span class="text-sm text-white/60 text-center leading-none">|</span>
+                  <span class="font-mono text-xl md:text-2xl font-bold ${timeColor}">${exam.endTime}</span>
                 </div>
               </div>
               
@@ -319,25 +453,24 @@
       const listContainer = document.getElementById('editing-list');
       
       if (editingSchedule.length === 0) {
-        listContainer.innerHTML = `<p class="text-center text-white/50 py-4 tracking-widest">無考程項目</p>`;
+        listContainer.innerHTML = `<p class="text-center text-white/50 py-8 bg-black/10 rounded-lg">尚無考試項目</p>`;
         return;
       }
 
       listContainer.innerHTML = editingSchedule.map(item => `
-        <div class="flex justify-between items-center p-2 md:p-3 chalk-box bg-white/5">
-          <div class="flex items-center gap-2 md:gap-3 flex-wrap flex-1">
-            <!-- 確保設定清單裡的文字也不會有過寬的空白 -->
-            <span class="text-lg md:text-xl font-bold chalk-text tracking-widest">${item.subject}</span>
-            <span class="text-white/80 px-2 md:px-3 py-1 font-mono text-sm md:text-lg tracking-widest border-l-2 border-white/30">
-              ${item.startTime} - ${item.endTime}
-            </span>
+        <div class="flex justify-between items-center p-3 md:p-4 rounded-xl bg-black/30 border border-white/5 hover:border-[var(--xmas-gold)] transition-colors">
+          <div class="flex items-center gap-3 md:gap-4 flex-wrap flex-1">
+            <span class="text-lg md:text-xl font-bold text-white">${item.subject}</span>
+            <div class="flex items-center text-white/80 font-mono bg-black/40 px-3 py-1 rounded-md text-sm md:text-base">
+              ${item.startTime} <i class="ph ph-arrow-right mx-2"></i> ${item.endTime}
+            </div>
           </div>
-          <div class="flex items-center gap-1 shrink-0">
-            <button onclick="editEditingItem('${item.id}')" class="text-white/50 hover:text-[var(--chalk-yellow)] p-1.5 md:p-2 transition-colors">
-              <i class="ph ph-pencil-simple text-xl md:text-2xl"></i>
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="editEditingItem('${item.id}')" class="text-white/60 hover:text-[var(--xmas-gold)] p-2 bg-white/5 rounded-lg transition-colors">
+              <i class="ph ph-pencil-simple text-xl"></i>
             </button>
-            <button onclick="removeEditingItem('${item.id}')" class="text-white/50 hover:text-[var(--chalk-red)] p-1.5 md:p-2 transition-colors">
-              <i class="ph ph-eraser text-xl md:text-2xl"></i>
+            <button onclick="removeEditingItem('${item.id}')" class="text-white/60 hover:text-red-400 p-2 bg-white/5 rounded-lg transition-colors">
+              <i class="ph ph-trash text-xl"></i>
             </button>
           </div>
         </div>
@@ -399,7 +532,7 @@
     }
 
     function syncToMainBoard() {
-      try { localStorage.setItem('boardAppData', JSON.stringify(appData)); } catch (e) {}
+      try { localStorage.setItem('xmasBoardAppData', JSON.stringify(appData)); } catch (e) {}
       renderNotes();
       renderSchedule();
       updateClock();
@@ -429,7 +562,7 @@
     }
 
     function deleteFromMain(id) {
-      if (confirm('確定要從黑板上擦去這個科目嗎？')) {
+      if (confirm('確定要刪除這個科目嗎？')) {
         appData.schedule = appData.schedule.filter(item => item.id !== id);
         activeExamId = null; 
         syncToMainBoard();
@@ -444,8 +577,8 @@
       currentEditId = null;
       const btn = document.getElementById('btn-submit-item');
       document.getElementById('submit-text').textContent = '新增';
-      document.getElementById('submit-icon').className = 'ph ph-plus text-lg md:text-xl';
-      btn.className = "col-span-2 border-2 border-[var(--chalk-green)] text-[var(--chalk-green)] hover:bg-[var(--chalk-green)] hover:text-black p-2 flex items-center gap-1 font-bold transition-all w-full md:w-auto justify-center tracking-widest rounded shadow-sm text-sm md:text-base";
+      document.getElementById('submit-icon').className = 'ph ph-plus-circle text-xl';
+      btn.className = "col-span-2 bg-[var(--xmas-red)] text-white hover:bg-red-700 p-2.5 flex items-center gap-1 font-bold transition-all w-full md:w-auto justify-center rounded-lg shadow-md text-sm md:text-base border border-red-900";
     }
 
     function addEditingItem() {
@@ -486,15 +619,20 @@
         resetInputFields(); 
 
         const btn = document.getElementById('btn-submit-item');
-        document.getElementById('submit-text').textContent = '成功儲存！';
-        btn.classList.add('bg-[var(--chalk-green)]', 'text-black');
+        document.getElementById('submit-text').textContent = '已儲存！';
+        btn.classList.replace('bg-[var(--xmas-red)]', 'bg-[var(--xmas-gold)]');
+        btn.classList.replace('text-white', 'text-black');
+        btn.classList.replace('hover:bg-red-700', 'hover:bg-yellow-500');
+        
         setTimeout(() => {
           document.getElementById('submit-text').textContent = '新增';
-          btn.classList.remove('bg-[var(--chalk-green)]', 'text-black');
-        }, 1200);
+          btn.classList.replace('bg-[var(--xmas-gold)]', 'bg-[var(--xmas-red)]');
+          btn.classList.replace('text-black', 'text-white');
+          btn.classList.replace('hover:bg-yellow-500', 'hover:bg-red-700');
+        }, 1000);
 
       } else {
-        alert('請把黑板上的資訊填寫完整喔！');
+        alert('請填寫完整的科目與時間資訊喔！');
       }
     }
 
@@ -507,9 +645,9 @@
         currentEditId = id;
         
         const btn = document.getElementById('btn-submit-item');
-        document.getElementById('submit-text').textContent = '更新';
-        document.getElementById('submit-icon').className = 'ph ph-check text-lg md:text-xl';
-        btn.className = "col-span-2 border-2 border-[var(--chalk-yellow)] text-[var(--chalk-yellow)] hover:bg-[var(--chalk-yellow)] hover:text-black p-2 flex items-center gap-1 font-bold transition-all w-full md:w-auto justify-center tracking-widest rounded shadow-sm text-sm md:text-base";
+        document.getElementById('submit-text').textContent = '更新儲存';
+        document.getElementById('submit-icon').className = 'ph ph-check-circle text-xl';
+        btn.className = "col-span-2 bg-[var(--xmas-gold)] text-black hover:bg-yellow-500 p-2.5 flex items-center gap-1 font-bold transition-all w-full md:w-auto justify-center rounded-lg shadow-md text-sm md:text-base border border-yellow-600";
       }
     }
 
@@ -524,6 +662,19 @@
     }
 
     function init() {
+      // Add custom slow spin animation class for active hourglass
+      const style = document.createElement('style');
+      style.innerHTML = `
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 3s linear infinite;
+        }
+      `;
+      document.head.appendChild(style);
+
       renderNotes();
       renderSchedule(); 
       updateClock();    
